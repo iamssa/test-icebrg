@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { useLogin, useRefreshToken } from './apiService';
+import { useLogin, useRefreshToken } from './api/apiService.ts';
 import { isTokenExpired, shouldRefreshToken } from './tokenService';
 
 interface AuthContextType {
@@ -35,8 +35,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         try {
             setError(null);
             const data = await loginMutation.mutateAsync({ email, password });
-            setToken(data.access_token);
-            localStorage.setItem('token', data.access_token);
+
+            setToken(data.access_token || null);
+
+            data.access_token && localStorage.setItem('token', data.access_token);
+            data.refresh_token && localStorage.setItem('refreshToken', data.refresh_token);
         } catch (err) {
             setError('Authentication failed. Please check your credentials.');
             throw err;
@@ -46,14 +49,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const logout = () => {
         setToken(null);
         localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
     };
 
     const refreshToken = async () => {
         try {
             const data = await refreshTokenMutation.mutateAsync();
-            setToken(data.token);
-            localStorage.setItem('token', data.token);
-            return data.token;
+
+            setToken(data.access_token || null);
+
+            data.access_token && localStorage.setItem('token', data.access_token);
+            data.refresh_token && localStorage.setItem('refreshToken', data.refresh_token);
         } catch (err) {
             setError('Failed to refresh token. Please login again.');
             logout();
