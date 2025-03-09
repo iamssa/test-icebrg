@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useSearchSuggestions } from './api/apiService.ts';
-import { useAuth } from './AuthProvider';
-import { useDebounce } from './useDebounce';
-import {ContinentModel, CountryModel, LanguageModel} from "./api/apiTypes.ts";
+import React, {useState, useEffect, useRef, useMemo} from 'react';
+import { useSearchSuggestions } from '../services/apiService.ts';
+import { useAuth } from '../AuthProvider.tsx';
+import { useDebounce } from '../hooks/useDebounce.ts';
 
 interface AutocompleteProps {
     placeholder?: string;
@@ -12,7 +11,6 @@ export const Autocomplete = ({ placeholder = 'Search...'}: AutocompleteProps) =>
     const { isAuthenticated } = useAuth();
     const [inputValue, setInputValue] = useState('');
     const [showSuggestions, setShowSuggestions] = useState(false);
-    const [suggestionList, setSuggestionList] = useState<ContinentModel[] | CountryModel[] | LanguageModel[]>([]);
     const inputRef = useRef<HTMLInputElement>(null);
     const suggestionRef = useRef<HTMLDivElement>(null);
 
@@ -25,13 +23,17 @@ export const Autocomplete = ({ placeholder = 'Search...'}: AutocompleteProps) =>
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
+
+        if (value === inputValue) {
+            return;
+        }
+
         setInputValue(value);
 
         if (value.trim().length >= 2) {
             setShowSuggestions(true);
         } else {
             setShowSuggestions(false);
-            setSuggestionList([]);
         }
     };
 
@@ -45,14 +47,22 @@ export const Autocomplete = ({ placeholder = 'Search...'}: AutocompleteProps) =>
         inputRef.current?.focus();
     };
 
+    const suggestionList = useMemo(() => {
+        if (!suggestionsData) {
+            return [];
+        }
+
+        return Object.values(suggestionsData).flat().filter((item) => !!item);
+    }, [suggestionsData]);
+
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (
-                suggestionRef.current &&
+            const isClickOutside = suggestionRef.current &&
                 !suggestionRef.current.contains(event.target as Node) &&
                 inputRef.current &&
                 !inputRef.current.contains(event.target as Node)
-            ) {
+
+            if (isClickOutside) {
                 setShowSuggestions(false);
             }
         };
@@ -62,16 +72,6 @@ export const Autocomplete = ({ placeholder = 'Search...'}: AutocompleteProps) =>
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
-
-    useEffect(() => {
-        if (!suggestionsData) {
-            return;
-        }
-
-        const suggestionsFlatArr = Object.values(suggestionsData).flat().filter((item) => !!item);
-
-        setSuggestionList(suggestionsFlatArr);
-    }, [suggestionsData]);
 
     if (!isAuthenticated) {
         return null;
@@ -84,7 +84,6 @@ export const Autocomplete = ({ placeholder = 'Search...'}: AutocompleteProps) =>
                 type="text"
                 value={inputValue}
                 onChange={handleInputChange}
-                onFocus={() => inputValue.trim().length >= 2 && setShowSuggestions(true)}
                 placeholder={placeholder}
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />

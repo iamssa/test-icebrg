@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint test-icebrg",
     "preview": "vite preview",
-    "generate-api-types": "swagger-typescript-api -p https://icebrg.mehanik.me/swagger.json -o ./src/api -n apiTypes.ts"
+    "generate-api-types": "swagger-typescript-api -p https://icebrg.mehanik.me/swagger.json -o src/types -n apiTypes.ts"
   },
   "dependencies": {
     "@tailwindcss/vite": "4.0.9",

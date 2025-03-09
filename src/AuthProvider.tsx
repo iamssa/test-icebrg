@@ -1,6 +1,6 @@
 import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { useLogin, useRefreshToken } from './api/apiService.ts';
-import { isTokenExpired, shouldRefreshToken } from './tokenService';
+import { useLogin, useRefreshToken } from './services/apiService.ts';
+import { isTokenExpired, shouldRefreshToken } from './services/tokenService.ts';
 
 interface AuthContextType {
     token: string | null;

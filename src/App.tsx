@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from './AuthProvider';
-import { LoginForm } from './LoginForm';
-import { Autocomplete } from "./Autocomplete.tsx";
+import { LoginForm } from './components/LoginForm.tsx';
+import { Autocomplete } from "./components/Autocomplete.tsx";
 
 const queryClient = new QueryClient();
 

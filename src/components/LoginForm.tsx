@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from './AuthProvider';
+import { useAuth } from '../AuthProvider.tsx';
 
 export const LoginForm = () => {
     const [email, setEmail] = useState('');

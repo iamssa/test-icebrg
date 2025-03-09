@@ -1,5 +1,5 @@
 import {useMutation, useQuery} from '@tanstack/react-query';
-import {Api, SearchResponse} from "./apiTypes.ts";
+import {Api, SearchResponse} from "../types/apiTypes.ts";
 
 interface SecurityData {
     access_token: string;
